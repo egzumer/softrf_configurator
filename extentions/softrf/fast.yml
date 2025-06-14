@@ -1,0 +1,67 @@
+# Project version 3.5.1 06.06.25.14.22+9 Jun 25
+# The name of the extension developer
+author: egzi
+
+# Define the minimum Android SDK level your extension supports.
+min_sdk: 7
+# If enabled, extension will be optimized using ProGuard.
+proguard: true
+# If enabled, extension will be optimized using R8.
+R8: true
+# Enable to collect ProGuard rules from runtime AARs
+# collect_rules: false
+# If enabled, Kotlin Standard Libraries will be included with the extension.
+# kotlin: false
+# Kotlin Compiler version.
+# kotlin_version: 1.9.24
+
+# Enable to desugar extension's source code.
+desugar_sources: false
+# Enable to desugar runtime dependencies.
+desugar_deps: false
+# If enabled, the D8 tool will generate desugared jar (classes.dex)
+desugar_dex: true
+
+# Select resolver tool between `gradle/maven` to fetch transitive dependencies.
+# resolver: gradle
+
+# Default repositories are Maven Central, Google Maven & Maven Local.
+# If the library you want to use is not available in these repositories, add here by specifying their URLs.
+# repositories:
+# - https://jitpack.io/
+
+# Runtime dependencies [Remote and Local]
+# dependencies:
+# - groupId:artifactId:version
+# - mylibrary.jar
+
+# Compile-time dependencies [Remote and Local]
+# compile_time:
+# - groupId:artifactId:version
+# - mylibrary.jar
+
+# Define dependencies to skip during resolve. [Remote only]
+# excludes:
+# - groupId:artifactId:version
+
+# Extension assets. [Should be present in assets directory]
+# assets:
+# - my-awesome-asset.anything
+
+# Attach custom XML to bundle it with APK. [Should be present in assets directory within relative child directory]
+# xmls:
+# - targetPath/myfile.xml
+
+# Define AAR libraries to attach with extension. [Remote and Local]
+# aars:
+# - groupId:artifactId:version
+# - mylibrary.aar
+
+# Enable to write docs in Markdown during build.
+gen_docs: true
+# Enable to increment the version number of each component during build.
+auto_version: true
+# Enable to remove @annotations from the extension.
+deannonate: true
+# Enable to skip matching classes provided by MIT.
+filter_mit_classes: false
