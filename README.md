@@ -9,7 +9,7 @@
 
 # What is it
 This is a very simple android configuration software for [SoftRF devices](https://github.com/lyusupov/SoftRF)<br>
-There is an [app](https://github.com/lyusupov/SoftRF/wiki/SoftRF-Configuration-Tool) for that already, but there is no source code available. The app is outdated, it doesn't have newer protocols and the BLE search results were always bloated with some random devices. My app fixes those issues, although there are only base setting available for now.<br><br>
+There is an [app](https://github.com/lyusupov/SoftRF/wiki/SoftRF-Configuration-Tool) for that already, but there is no source code available. The app is outdated, it doesn't have newer protocols and the BLE search results were always bloated with some random devices. My app fixes those issues.<br><br>
 As I don't know how to code for android I found a visual programming tool called [APP Inventor](https://ai2.appinventor.mit.edu/) (AI) and this software is built using that.
 # How to build
 There are two parts to this app. One is an AI project file - SoftRF_configurator.aia. You simply import that and you are ready to modify the software. When you are done you click "Build" in the AI top menu.<br>

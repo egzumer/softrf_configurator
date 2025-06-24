@@ -11,24 +11,36 @@ import com.google.appinventor.components.runtime.*;
 import java.util.HashMap;
 
 @DesignerComponent(
-	version = 11,
-	versionName = "1.0",
+	version = 4,
+	versionName = "1.1",
 	description = "Developed by egzi using Fast.",
 	iconName = "icon.png"
 )
 public class SoftRF extends AndroidNonvisibleComponent {
 
+  private int tryParseInt(String value, int defaultVal) {
+      try {
+          return Integer.parseInt(value);
+      } catch (NumberFormatException e) {
+          return defaultVal;
+      }
+  }
+
+  private int tryParseInt(String value) {
+      return tryParseInt(value, 0);
+  }
+
   public SoftRF(ComponentContainer container) {
     super(container.$form());
   }
 
-  @SimpleFunction(description = "Returns sum of two integer numbers.")
-  public int SumNumber(int firstNumber, int secondNumber) {
-    return firstNumber + secondNumber;
-  }
+  // @SimpleFunction(description = "Returns sum of two integer numbers.")
+  // public int SumNumber(int firstNumber, int secondNumber) {
+  //   return firstNumber + secondNumber;
+  // }
   
   
-  HashMap<String, Integer> devConfig = new HashMap<String, Integer>();
+  private HashMap<String, Integer> devConfig = new HashMap<String, Integer>();
   private String nmeaBuffer;  
   
     /*
@@ -52,13 +64,6 @@ public class SoftRF extends AndroidNonvisibleComponent {
 	  return "$PSRFC,?*47";
   }
 
-  @SimpleProperty(
-    category = PropertyCategory.BEHAVIOR,
-    description = "Command for getting configuration from SoftRF device.")
-  public String CmdGetVisualCfg() {
-	  return "$PSKVC,?*4E";
-  }
-
 
   //PSRFC,1,0,1,1,1,1,0,2,2,1,0,1,1,4,0,0,0,0,0
   @SimpleEvent(
@@ -68,6 +73,78 @@ public class SoftRF extends AndroidNonvisibleComponent {
       EventDispatcher.dispatchEvent(this, "PSRFC", version, mode, protocol, region, actype, alarm, txpower, volume, ledring, 
                     gnss, priv, legacy, sens, nmea, gdl90, d1090, stealth, no_track, powersave);
   }
+
+/*
+
+  TO RETREIVE SETTINGS
+  --------------------
+
+  Query:    "$PSKVC,?*4E"
+
+  Response: "$PSKVC,<version>,<adapter>,<connection method>,<units>,
+                    <radar zoom level>,<data protocol>,<baud rate>,
+                    <server name>,<server key>,
+                    <screen rotation>,<radar orientation>,
+                    <aircrafts database>,<aircraft ID preference>,
+                    <view mode>,<voice alarm>,
+                    <e-paper anti-ghosting>,<traffic filter>,
+                    <power save>,<team member ID>*<checksum><CR><LF>"
+
+  TO APPLY SETTINGS
+  -----------------
+
+  Sentence: "$PSKVC,1,
+                    <adapter>,<connection method>,<units>,
+                    <radar zoom level>,<data protocol>,<baud rate>,
+                    <server name>,<server key>,
+                    <screen rotation>,<radar orientation>,
+                    <aircrafts database>,<aircraft ID preference>,
+                    <view mode>,<voice alarm>,
+                    <e-paper anti-ghosting>,<traffic filter>,
+                    <power save>,<team member ID>*<checksum><CR><LF>"
+
+  Response: dump of new settings followed by system restart
+
+  EXAMPLE OF NMEA SENTENCE
+  ------------------------
+
+  $PSKVC,1,0,0,0,2,1,0,,,0,0,0,3,0,0,0,0,0,AABBCC*70
+
+  LIST OF SETTINGS AVAILABLE
+  --------------------------
+
+  TBD
+
+  RECOMMENDED DEFAULT SETTINGS
+  ----------------------------
+
+  TBD
+
+  OTHER INFORMATION
+  -----------------
+
+  https://github.com/lyusupov/SoftRF/wiki/SkyView-settings
+
+ */
+
+  @SimpleProperty(
+    category = PropertyCategory.BEHAVIOR,
+    description = "Command for getting configuration from SoftRF device.")
+  public String CmdGetVisualCfg() {
+	  return "$PSKVC,?*4E";
+  }
+
+ @SimpleEvent(
+    description = "PSKVC")
+  public void PSKVC(int units, int radarZoomLevel, int screenRotation, int radarOrientation, int aircraftsDatabase, 
+                    int aircraftIdPreference, int viewMode, int ePaperAntiGhosting, int trafficFilter, 
+                    String teamMemberId) {
+      EventDispatcher.dispatchEvent(this, "PSKVC", units, radarZoomLevel, screenRotation, radarOrientation, 
+                                    aircraftsDatabase, aircraftIdPreference, viewMode, ePaperAntiGhosting, 
+                                    trafficFilter, teamMemberId);
+  }
+
+
 
   //   DESCRIPTION
   // -----------
@@ -80,7 +157,6 @@ public class SoftRF extends AndroidNonvisibleComponent {
 
   // EXAMPLE OF NMEA SENTENCE
   // ------------------------
-
   // $PSRFH,AABBCC,1,0,0,370*76
   @SimpleEvent(
     description = "PSRFH")
@@ -229,25 +305,25 @@ public class SoftRF extends AndroidNonvisibleComponent {
       if (nmeaSentence.startsWith("PSRFC")) {
         String[] parts = nmeaSentence.split(",");
         if (parts.length >= 20) {
-            int version = Integer.parseInt(parts[1]);
-            int mode = Integer.parseInt(parts[2]);
-            int protocol = Integer.parseInt(parts[3]);
-            int region = Integer.parseInt(parts[4]);
-            int actype = Integer.parseInt(parts[5]);
-            int alarm = Integer.parseInt(parts[6]);
-            int txpower = Integer.parseInt(parts[7]);
-            int volume = Integer.parseInt(parts[8]);
-            int ledring = Integer.parseInt(parts[9]);
-            int gnss = Integer.parseInt(parts[10]);
-            int priv = Integer.parseInt(parts[11]);
-            int legacy = Integer.parseInt(parts[12]);
-            int sens = Integer.parseInt(parts[13]);
-            int nmeaFlag = Integer.parseInt(parts[14]);
-            int gdl90 = Integer.parseInt(parts[15]);
-            int d1090 = Integer.parseInt(parts[16]);
-            int stealth = Integer.parseInt(parts[17]);
-            int no_track = Integer.parseInt(parts[18]);
-            int powersave = Integer.parseInt(parts[19]);
+            int version = tryParseInt(parts[1]);
+            int mode = tryParseInt(parts[2]);
+            int protocol = tryParseInt(parts[3]);
+            int region = tryParseInt(parts[4]);
+            int actype = tryParseInt(parts[5]);
+            int alarm = tryParseInt(parts[6]);
+            int txpower = tryParseInt(parts[7]);
+            int volume = tryParseInt(parts[8]);
+            int ledring = tryParseInt(parts[9]);
+            int gnss = tryParseInt(parts[10]);
+            int priv = tryParseInt(parts[11]);
+            int legacy = tryParseInt(parts[12]);
+            int sens = tryParseInt(parts[13]);
+            int nmeaFlag = tryParseInt(parts[14]);
+            int gdl90 = tryParseInt(parts[15]);
+            int d1090 = tryParseInt(parts[16]);
+            int stealth = tryParseInt(parts[17]);
+            int no_track = tryParseInt(parts[18]);
+            int powersave = tryParseInt(parts[19]);
 
             devConfig.put("version", version);
             devConfig.put("mode", mode);
@@ -273,18 +349,45 @@ public class SoftRF extends AndroidNonvisibleComponent {
                   gnss, priv, legacy, sens, nmeaFlag, gdl90, d1090, stealth, no_track, powersave);
         }
       } 
-      // else if (nmeaSentence.startsWith("PSRFH")) {
-      //   String[] parts = nmeaSentence.split(",");
-      //   if (parts.length >= 6) {
-      //       String deviceId = parts[1];
-      //       int protocol = Integer.parseInt(parts[2]);
-      //       int rxPackets = Integer.parseInt(parts[3]);
-      //       int txPackets = Integer.parseInt(parts[4]);
-      //       float batteryVoltage = Integer.parseInt(parts[5]) / 100.0f; // Convert centi-Volts to Volts
+      else if (nmeaSentence.startsWith("PSKVC")) {
+        String[] parts = nmeaSentence.split(",");
+        if (parts.length >= 20) {
+            // int version = tryParseInt(parts[1]);
+            // int adapter = tryParseInt(parts[2]);
+            // int connectionMethod = tryParseInt(parts[3]);
+            int units = tryParseInt(parts[4]);
+            int radarZoomLevel = tryParseInt(parts[5]);
+            // int dataProtocol = tryParseInt(parts[6]);
+            // int baudRate = tryParseInt(parts[7]);
+            // String serverName = parts[8];
+            // String serverKey = parts[9];
+            int screenRotation = tryParseInt(parts[10]);
+            int radarOrientation = tryParseInt(parts[11]);
+            int aircraftsDatabase = tryParseInt(parts[12]);
+            int aircraftIdPreference = tryParseInt(parts[13]);
+            int viewMode = tryParseInt(parts[14]);
+            // int voiceAlarm = tryParseInt(parts[15]);
+            int ePaperAntiGhosting = tryParseInt(parts[16]);
+            int trafficFilter = tryParseInt(parts[17]);
+            // int powerSave = tryParseInt(parts[18]);
+            String teamMemberId = parts[19];
 
-      //       PSRFH(deviceId, protocol, rxPackets, txPackets, batteryVoltage);
-      //   }
-      // }
+            PSKVC(units, radarZoomLevel, screenRotation, radarOrientation, aircraftsDatabase, aircraftIdPreference,
+                  viewMode, ePaperAntiGhosting, trafficFilter, teamMemberId);
+        }
+      }
+      else if (nmeaSentence.startsWith("PSRFH")) {
+        String[] parts = nmeaSentence.split(",");
+        if (parts.length >= 6) {
+            String deviceId = parts[1];
+            int protocol = tryParseInt(parts[2]);
+            int rxPackets = tryParseInt(parts[3]);
+            int txPackets = tryParseInt(parts[4]);
+            float batteryVoltage = tryParseInt(parts[5]) / 100.0f; // Convert centi-Volts to Volts
+
+            PSRFH(deviceId, protocol, rxPackets, txPackets, batteryVoltage);
+        }
+      }     
       // else if (nmeaSentence.startsWith("GNGGA")) {
       //   String[] parts = nmeaSentence.split(",");
       //   if (parts.length >= 13) {
