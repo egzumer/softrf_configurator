@@ -17,8 +17,8 @@ import java.math.RoundingMode;
 import java.util.Locale;
 
 @DesignerComponent(
-	version = 21,
-	versionName = "1.2",
+	version = 22,
+	versionName = "1.3",
 	description = "Developed by egzi using Fast.",
 	iconName = "icon.png"
 )
@@ -235,6 +235,30 @@ public class SoftRF extends AndroidNonvisibleComponent {
       EventDispatcher.dispatchEvent(this, "GNGGA", utcTime, latitude, longitude, gnssStatus, numSatellites, hdop, altitude, heightEllipsoid, diffTime, diffRefStation);
   }
 
+  // $GPGGA,hhmmss.ss,llll.ll,a,yyyyy.yy,a,x,xx,x.x,x.x,M,x.x,M,x.x,xxxx*hh
+  // 1    = UTC of Position
+  // 2    = Latitude
+  // 3    = N or S
+  // 4    = Longitude
+  // 5    = E or W
+  // 6    = GPS quality indicator (0=invalid; 1=GPS fix; 2=Diff. GPS fix)
+  // 7    = Number of satellites in use [not those in view]
+  // 8    = Horizontal dilution of position
+  // 9    = Antenna altitude above/below mean sea level (geoid)
+  // 10   = Meters  (Antenna height unit)
+  // 11   = Geoidal separation (Diff. between WGS-84 earth ellipsoid and
+  //        mean sea level.  -=geoid is below WGS-84 ellipsoid)
+  // 12   = Meters  (Units of geoidal separation)
+  // 13   = Age in seconds since last update from diff. reference station
+  // 14   = Diff. reference station ID#
+  // 15   = Checksum
+  @SimpleEvent(
+    description = "GPGGA")
+  public void GPGGA(String utcTime, float latitude, float longitude, int gnssStatus, int numSatellites, float hdop, float altitude, float heightEllipsoid, float diffTime, String diffRefStation) {
+      EventDispatcher.dispatchEvent(this, "GPGGA", utcTime, latitude, longitude, gnssStatus, numSatellites, hdop, altitude, heightEllipsoid, diffTime, diffRefStation);
+  }
+
+
   // Format: $GNRMC,<1>,<2>,<3>,<4>,<5>,<6>,<7>,<8>,<9>,<10>,<11>,< 12>*xx<CR><LF> 
   // E.g: $GNRMC,072446.00,A,3130.5226316,N,12024.0937010,E,0.01,0.00,040620,0.0,E,D*3D 
   // Field explanation:
@@ -257,6 +281,26 @@ public class SoftRF extends AndroidNonvisibleComponent {
   public void GNRMC(String utcTime, String positionStatus, float latitude, float longitude, float groundSpeed, float groundHeading, String utcDate, float magneticDeclination, String magneticDirection, String mode) {
       EventDispatcher.dispatchEvent(this, "GNRMC", utcTime, positionStatus, latitude, longitude, groundSpeed, groundHeading, utcDate, magneticDeclination, magneticDirection, mode);
   }
+
+  // $GPRMC,hhmmss.ss,A,llll.ll,a,yyyyy.yy,a,x.x,x.x,ddmmyy,x.x,a*hh
+  // 1    = UTC of position fix
+  // 2    = Data status (V=navigation receiver warning)
+  // 3    = Latitude of fix
+  // 4    = N or S
+  // 5    = Longitude of fix
+  // 6    = E or W
+  // 7    = Speed over ground in knots
+  // 8    = Track made good in degrees True
+  // 9    = UT date
+  // 10   = Magnetic variation degrees (Easterly var. subtracts from true course)
+  // 11   = E or W
+  // 12   = Checksum
+  @SimpleEvent(
+    description = "GPRMC")
+  public void GPRMC(String utcTime, String positionStatus, float latitude, float longitude, float groundSpeed, float groundHeading, String utcDate, float magneticDeclination, String magneticDirection) {
+      EventDispatcher.dispatchEvent(this, "GPRMC", utcTime, positionStatus, latitude, longitude, groundSpeed, groundHeading, utcDate, magneticDeclination, magneticDirection);
+  }
+
 
   // PFLAU,<RX>,<TX>,<GPS>,<Power>,<AlarmLevel>,<RelativeBearing>,
   // <AlarmType>,<RelativeVertical>,<RelativeDistance>[,<ID>]
@@ -610,6 +654,44 @@ public class SoftRF extends AndroidNonvisibleComponent {
             GNGGA(utcTime, latitude, longitude, gnssStatus, numSatellites, hdop, altitude, heightEllipsoid, diffTime, diffRefStation);
         }
       } 
+      else if (nmeaSentence.startsWith("GPGGA")) {
+        String[] parts = nmeaSentence.split(",");
+        if (parts.length >= 13) {
+            String utcTime = parts[1];
+            // Convert latitude from ddmm.mmmmmmm to decimal degrees
+            float rawLat = tryParseFloat(parts[2]);
+            String latHemisphere = parts[3];
+            float latitude = 0.0f;
+            if (rawLat != 0.0f) {
+              int latDegrees = (int)(rawLat / 100);
+              float latMinutes = rawLat - (latDegrees * 100);
+              latitude = latDegrees + (latMinutes / 60.0f);
+              if ("S".equalsIgnoreCase(latHemisphere)) {
+                latitude = -latitude;
+              }
+            }
+            float rawLon = tryParseFloat(parts[4]);
+            String lonHemisphere = parts[5];
+            float longitude = 0.0f;
+            if (rawLon != 0.0f) {
+              int lonDegrees = (int)(rawLon / 100);
+              float lonMinutes = rawLon - (lonDegrees * 100);
+              longitude = lonDegrees + (lonMinutes / 60.0f);
+              if ("W".equalsIgnoreCase(lonHemisphere)) {
+                longitude = -longitude;
+              }
+            }
+            int gnssStatus = tryParseInt(parts[6]);
+            int numSatellites = tryParseInt(parts[7]);
+            float hdop = tryParseFloat(parts[8]);
+            float altitude = tryParseFloat(parts[9]);
+            float heightEllipsoid = tryParseFloat(parts[10]);
+            float diffTime = tryParseFloat(parts[11]);
+            String diffRefStation = parts[12];
+
+            GPGGA(utcTime, latitude, longitude, gnssStatus, numSatellites, hdop, altitude, heightEllipsoid, diffTime, diffRefStation);
+        }
+      }
       else if (nmeaSentence.startsWith("GNRMC")) {
         String[] parts = nmeaSentence.split(",");
         if (parts.length >= 13) {
@@ -648,6 +730,45 @@ public class SoftRF extends AndroidNonvisibleComponent {
             String mode = parts[12];
 
             GNRMC(utcTime, positionStatus, latitude, longitude, groundSpeed, groundHeading, utcDate, magneticDeclination, magneticDirection, mode);
+        }
+      }
+      else if (nmeaSentence.startsWith("GPRMC")) {
+        String[] parts = nmeaSentence.split(",");
+        if (parts.length >= 13) {
+            String utcTime = parts[1];
+            String positionStatus = parts[2];
+
+            // Convert latitude from ddmm.mmmmmmm to decimal degrees
+            float rawLat = tryParseFloat(parts[3]);
+            String latHemisphere = parts[4];
+            float latitude = 0.0f;
+            if (rawLat != 0.0f) {
+              int latDegrees = (int)(rawLat / 100);
+              float latMinutes = rawLat - (latDegrees * 100);
+              latitude = latDegrees + (latMinutes / 60.0f);
+              if ("S".equalsIgnoreCase(latHemisphere)) {
+                latitude = -latitude;
+              }
+            }
+            float rawLon = tryParseFloat(parts[5]);
+            String lonHemisphere = parts[6];
+            float longitude = 0.0f;
+            if (rawLon != 0.0f) {
+              int lonDegrees = (int)(rawLon / 100);
+              float lonMinutes = rawLon - (lonDegrees * 100);
+              longitude = lonDegrees + (lonMinutes / 60.0f);
+              if ("W".equalsIgnoreCase(lonHemisphere)) {
+                longitude = -longitude;
+              }
+            }
+
+            float groundSpeed = tryParseFloat(parts[7]);
+            float groundHeading = tryParseFloat(parts[8]);
+            String utcDate = parts[9];
+            float magneticDeclination = tryParseFloat(parts[10]);
+            String magneticDirection = parts[11];
+
+            GPRMC(utcTime, positionStatus, latitude, longitude, groundSpeed, groundHeading, utcDate, magneticDeclination, magneticDirection);
         }
       }
       else if (nmeaSentence.startsWith("PFLAU")) {
