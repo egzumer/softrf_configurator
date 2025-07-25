@@ -1,6 +1,4 @@
-<p align="center">
-    <img src="images\softrf_conf.png" width="120px"/>
-</p>
+[<p align="center" style="font-size:30px;">↪ GET THE LATEST RELEASE ↩</p>](https://github.com/egzumer/softrf_configurator/releases/latest)
 
 <p align="center">
     <img src="images\ss1.jpg" width="240px"/>
@@ -10,12 +8,16 @@
     <img src="images\ss5.jpg" width="240px"/>
 </p>
 
-# [<p align="center">GET THE LATEST RELEASE</p>](https://github.com/egzumer/softrf_configurator/releases/latest)
+[<p align="center" style="font-size:30px;">↪ GET THE LATEST RELEASE ↩</p>](https://github.com/egzumer/softrf_configurator/releases/latest)
+
 # What is it
 This is an android configuration software for BLE equipped [SoftRF devices](https://github.com/lyusupov/SoftRF)<br>
-There is an [app](https://github.com/lyusupov/SoftRF/wiki/SoftRF-Configuration-Tool) for that already, but there is no source code available, the app is outdated, it lacks some newer SoftRF settings and the BLE search results are always bloated with some random devices. My app fixes those issues.<br><br>
-As I don't know how to code for android I used a visual programming tool called [APP Inventor](https://ai2.appinventor.mit.edu/) (AI).
+There is an [app](https://github.com/lyusupov/SoftRF/wiki/SoftRF-Configuration-Tool) for that already, but there is no source code available, the app is outdated, it lacks some newer SoftRF settings and the BLE search results are always bloated with some random devices. My app fixes those issues.
+
 # How to build
-There are two parts to this app. One is an AI project file - SoftRF_configurator.aia. You simply import that and you are ready to modify the software. When you are done you click "Build" in the AI top menu.<br>
+The app is built using visual programming tool called [APP Inventor](https://ai2.appinventor.mit.edu/) (AI).
+<br>
+<br>
+There are two parts to this app. One is an AI project file - SoftRF_configurator.aia. You simply import it and you are ready to modify the software. When you are done you click "Build" in the AI top menu.<br>
 <br>
 The second part is a custom extension ([extentions/softrf](extentions/softrf)) implementing some data processing code that I wasn't able to achieve with the AI itself. The extension is already built and included in the project, but if you want to modify the extension you have to implement changes, build the extension and import it again into the AI. The extension is built using [FAST](https://github.com/jewelshkjony/fast-cli).
