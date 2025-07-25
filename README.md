@@ -1,4 +1,4 @@
-[<p align="center" style="font-size:30px;">↪ GET THE LATEST RELEASE ↩</p>](https://github.com/egzumer/softrf_configurator/releases/latest)
+# [<p align="center">⇨ GET THE LATEST RELEASE ⇦</p>](https://github.com/egzumer/softrf_configurator/releases/latest)</p>
 
 <p align="center">
     <img src="images\ss1.jpg" width="240px"/>
@@ -8,7 +8,7 @@
     <img src="images\ss5.jpg" width="240px"/>
 </p>
 
-[<p align="center" style="font-size:30px;">↪ GET THE LATEST RELEASE ↩</p>](https://github.com/egzumer/softrf_configurator/releases/latest)
+# [<p align="center">⇨ GET THE LATEST RELEASE ⇦</p>](https://github.com/egzumer/softrf_configurator/releases/latest)</p>
 
 # What is it
 This is an android configuration software for BLE equipped [SoftRF devices](https://github.com/lyusupov/SoftRF)<br>
